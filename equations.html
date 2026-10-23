@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#040b12">
+  <meta name="description" content="亲手改变拉伸与黏性，观察真实解析涡流；从方程的逐项收支走向 Navier–Stokes 反例核心的尺度之美。">
+  <title>涡的形状 · 方程剧场</title>
+  <link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/equations.css">
+<link rel="stylesheet" href="/learning.css"></head>
+<body>
+  <canvas id="study-canvas" tabindex="0" role="application" aria-label="三维解析涡流。拖动或方向键转动视角，滚轮缩放，空格暂停。"></canvas>
+  <canvas id="scale-canvas" aria-hidden="true" hidden></canvas>
+  <canvas id="probe-overlay" aria-hidden="true"></canvas>
+  <header class="study-header">
+    <a class="study-brand" href="/">涡的形状<small>THE SHAPE OF FLOW</small></a>
+    <nav aria-label="展厅章节"><a href="/">01 涡环工坊</a><button id="room-physics" class="active" aria-pressed="true">02 方程剧场</button><button id="room-research" aria-pressed="false">03 研究尺度</button></nav>
+    <div class="header-actions"><button id="toggle-conditions" aria-expanded="false">调节条件</button><button id="study-load">载入</button><button id="study-about">作品与依据 ↗</button></div>
+  </header>
+
+  <main id="physics-room">
+    <section class="study-intro">
+      <p class="eyebrow">CHAPTER 02 / 拉伸 · 扩散 · 平衡</p>
+      <h1>拉长的涡，<br>为何会更强？</h1>
+      <p class="intro-copy">让一束光替你进入流体。<br>改变条件，看旋转如何集中、如何舒展。</p>
+      <div class="model-seal"><i></i> 解析速度场 · 高斯拉伸涡</div>
+      <p class="interaction-hint">拖动转动视角 · 点公式看变化</p>
+    </section>
+    <section class="study-observation" aria-live="polite">
+      <p class="eyebrow" id="study-phase">观察正在发生的变化</p><h2 id="study-heading">一场向内的旋转。</h2>
+      <p id="study-description"></p><p class="measured" id="study-evidence"></p>
+      
+      
+    </section>
+
+    <aside class="study-panel" aria-label="实验条件与剖面">
+      <div class="panel-heading"><span>选择一场演变</span><span class="micro">01—03</span></div>
+      <div class="experiment-presets" role="group" aria-label="解析实验"><button data-gaussian="diffusion">只看扩散</button><button data-gaussian="stretching" class="active">拉伸竞争</button><button data-gaussian="balance">平衡初态</button></div>
+      <form id="parameter-form">
+        <label class="parameter" for="study-strain">轴向拉伸 α <output id="strain-value">0.70</output><input id="study-strain" type="range" min="0" max="1.2" step="0.05" value="0.7"></label>
+        <label class="parameter" for="study-viscosity">运动黏性 ν <output id="viscosity-value">0.012</output><input id="study-viscosity" type="range" min="0.004" max="0.04" step="0.002" value="0.012"></label>
+        <details class="advanced"><summary>环量与初始核宽</summary><label class="parameter" for="study-gamma">环量 Γ <output id="gamma-value">3.2</output><input id="study-gamma" type="range" min="1" max="5" step="0.1" value="3.2"></label><label class="parameter" for="study-initialCore">初始核宽 a₀ <output id="initialCore-value">0.550</output><input id="study-initialCore" type="range" min="0.18" max="0.85" step="0.001" value="0.55"></label></details>
+        <div class="apply-row"><button type="submit" id="apply-parameters">用这些条件重新演变 ↗</button><span id="parameters-pending" hidden>待应用</span></div>
+        <p class="micro" id="active-parameters">改变条件从初态重算，便于比较原因。</p>
+      </form>
+      <div class="panel-actions"><button id="capture-comparison">记录此刻作对照</button><button id="clear-comparison" hidden>清除对照</button></div><div class="comparison" id="comparison-result" hidden></div><section class="profile-section" aria-label="真实涡量剖面">
+        <div class="panel-heading"><span>切开一层旋转</span><button id="probe-core">探针放到 r = a</button></div>
+        <svg id="profile-chart" viewBox="0 0 264 104" role="img" aria-label="涡量随半径变化的解析剖面"><path d="M16 12V84H252" class="chart-axis"/><path id="profile-area" class="profile-area"/><path id="reference-profile" class="reference-line"/><path id="profile-line" class="profile-line"/><line id="probe-line" x1="16" y1="12" x2="16" y2="84" class="probe-line"/><text x="16" y="100">0</text><text id="profile-extent" x="224" y="100">r</text><text id="profile-max" x="20" y="10">ω</text></svg>
+        <p class="micro" id="profile-legend"></p><label class="probe-control" for="study-probe">探针半径 r <output id="probe-value">0.00</output><input id="study-probe" type="range" min="0" max="2.4" step="0.01" value="0"></label>
+        <p class="micro" id="probe-reading"></p>
+      </section>
+      
+    <details class="question"><summary>想一想：涡核变细，什么变大？</summary><p>保持环量 Γ 不变，涡核宽度 a 减小时：</p><div class="answer-options"><button data-answer="peak">峰值涡量增大</button><button data-answer="circulation">环量必然增大</button></div><p id="student-answer" role="status"></p></details></aside>
+
+    <section class="equation-dock" aria-label="公式与真实计算收支">
+      <div class="dock-topline"><span>方程，在这个位置发生了什么？</span><span id="budget-location">探针：涡核轴心</span><button id="open-formulas">展开实际公式 ↗</button></div>
+      <div class="budget-equation"><span class="equation-lhs">∂ₜω =</span><button data-term="transport"><span>− (u·∇)ω</span><small>输运 <output id="budget-transport">—</output></small><i id="bar-transport"></i></button><b>＋</b><button data-term="stretch" class="active"><span>(ω·∇)u</span><small>拉伸 <output id="budget-stretch">—</output></small><i id="bar-stretch"></i></button><b>＋</b><button data-term="diffusion"><span>ν Δω</span><small>扩散 <output id="budget-diffusion">—</output></small><i id="bar-diffusion"></i></button><span class="budget-total">净变化<output id="budget-net">—</output></span></div>
+      <p id="term-explanation" class="term-explanation"></p>
+    </section>
+  </main>
+
+  <main id="research-room" hidden>
+    <section class="study-intro"><p class="eyebrow">CHAPTER 03 / 反例核心的尺度之美</p><h1>更快，<br>也可以更小。</h1><p class="intro-copy">沿论文的尺度关系靠近奇异时刻，<br>看局部速度与核心能量如何分离。</p><div class="model-seal research-seal"><i></i> 论文尺度释读 · 几何包络</div><p class="interaction-hint">铜线表示核心包络，不是粒子轨迹<br>拖动仍可转动视角</p></section>
+    <section class="study-observation"><p class="eyebrow">双向收缩 / 相对纤细</p><h2>不是绝对变长，<br>而是半径缩得更快。</h2><p>径向与轴向尺度都趋向零，半径缩得更快。这里描述的是强流动区域的范围，不能直接当作某个流体微团的长度。</p><p class="measured" id="scale-evidence"></p><p class="research-caption">论文尺度释读，非完整反例速度场。</p></section>
+    <aside class="study-panel research-panel"><p class="eyebrow">同一个 τ，四种尺度</p><h2>看见增长，<br>也看见代价。</h2><div class="scale-metrics"><div><span>径向 ℓᵣ ≍ τ¹ᐟ²</span><output id="scale-radial">1</output></div><div><span>轴向 ℓ𝓏 ≍ τ¹ᐟ²⁻ʰ</span><output id="scale-axial">1</output></div><div><span>速度 U ≍ τ⁻¹ᐟ²⁻ʰ</span><output id="scale-speed">1</output></div><div><span>核心能量 E ≍ τ¹ᐟ²⁻³ʰ</span><output id="scale-energy">1</output></div></div><svg id="scale-chart" viewBox="0 0 264 128" role="img" aria-label="论文代表幂律的对数坐标图"><path class="chart-axis" d="M22 10V112H252"/><path d="M22 61H252" class="chart-axis" stroke-dasharray="2 3"/><text x="3" y="18">3</text><text x="3" y="64">0</text><text x="0" y="110">−3</text><path id="scale-speed-curve" class="scale-speed"/><path id="scale-energy-curve" class="profile-line"/><line id="scale-cursor" class="probe-line" y1="10" y2="112"/><text x="22" y="125">0</text><text x="175" y="125">−log₁₀ τ → 6</text><text x="24" y="10">log₁₀ 相对标度</text></svg><p class="micro" id="research-power-note"></p><details class="question"><summary>速度变大，能量就一定变大？</summary><div class="answer-options"><button data-energy="no">不一定，还要看体积</button><button data-energy="yes">一定</button></div><p id="energy-answer" role="status"></p></details><details class="question"><summary>几何包络如何计算？</summary><p>q(1−η²) = τ<br>r = √(2qX)<br>z = q^(1/2−h) η</p><p id="research-window-note"></p></details><a class="source-link" href="https://cdn.openai.com/pdf/32d9f210-8b73-45e0-91bc-82a30aef8a9a/navier-stokes.pdf#page=3" target="_blank" rel="noreferrer">阅读原论文 §2.1 与 §3.1 ↗</a><div class="research-note">代表幂律来自论文 §2.1；几何按 §3.1 的相似坐标绘制，示意窗口由本作品选定。<strong>不包含完整反例的速度剖面、振荡脉冲与误差修正。</strong></div></aside>
+    <section class="research-dock"><div><span class="eyebrow">时间剩余量 τ = 1 − t</span><strong id="scale-tau">τ = 1</strong></div><label for="scale-slider">靠近奇异时刻<input id="scale-slider" type="range" min="0" max="6" step="0.01" value="0"></label><div class="research-camera-controls"><button id="scale-fit" class="outlined" aria-pressed="false">跟随尺度观察 · 关</button><p class="micro" id="scale-camera-note">固定镜头。缩得太小时，可打开跟随观察。</p></div><button id="scale-reset">回到起始尺度</button></section>
+  </main>
+
+  <footer class="study-footer"><div class="study-metrics"><div><span id="stat-one-label">涡核宽度 a</span><strong id="stat-one">—</strong></div><div><span id="stat-two-label">峰值涡量 ω₀</span><strong id="stat-two">—</strong></div><div><span id="stat-three-label">保持的环量 Γ</span><strong id="stat-three">—</strong></div><p id="scene-caption">解析速度场中的真实输运 · 无量纲</p></div><div class="playback-row"><button id="study-play" class="round" aria-label="暂停演变">Ⅱ</button><button id="study-reset" class="round" aria-label="重置当前实验">↻</button><label id="history-control" for="study-history">演变记录<input id="study-history" type="range" min="0" max="0" step="1" value="0"></label><output id="study-time">0.00 / 20 t</output><button id="study-save" class="save-card">留下这次理解 ↗</button></div><p class="footer-note"><span id="current-view">实时演变</span><span id="display-semantics">青绿 → 铜橙：涡量 0—≥40（对数色阶）</span></p></footer>
+
+
+  <dialog id="about-dialog"><button class="close" data-close="about-dialog" aria-label="关闭作品说明">×</button><p class="eyebrow">作品与研究边界</p><h2>让数学可以靠近，<br>让美感有据可循。</h2><p>《涡的形状》是一件以涡流演变为材料的数字艺术交互作品。你从涡环工坊进入方程剧场，再走向研究前沿；每一种画面都有对应的计算与来源。</p><dl class="model-list"><dt>01 涡环工坊</dt><dd>规则化离散涡丝近似，相互诱导、手势拉伸与涡核扩散。</dd><dt>02 方程剧场</dt><dd>无界高斯拉伸涡解析速度，径轴解析输运与角向 Simpson 积分生成示踪轨迹；公式、剖面与逐项收支读取同一状态。</dd><dt>03 研究尺度</dt><dd>基于 OpenAI 2026 年论文的核心尺度与相似坐标释读；不是完整反例速度场或证明复现。</dd></dl><p>研究论文给出的构造还需要振荡脉冲、残差抵消与外部光滑力。只把一个普通漩涡加速或压细，不能据此声称产生了数学奇性。Clay 对相关成果的评估遵循其程序；本作品不承担证明评审。</p><div class="sources"><a href="https://cdn.openai.com/pdf/32d9f210-8b73-45e0-91bc-82a30aef8a9a/navier-stokes.pdf" target="_blank" rel="noreferrer">Finite time blowup for Navier–Stokes，§2—3 ↗</a><a href="https://github.com/openai/NavierStokesAndEuler" target="_blank" rel="noreferrer">发布者提供的 Lean 形式化仓库 ↗</a><a href="https://www.claymath.org/news/navier-stokes-announcement/" target="_blank" rel="noreferrer">Clay 公告与评估说明 ↗</a><a href="/lab-2d.html">保留的二维绕流实验 ↗</a></div><p class="small-note">资料核对：2026-10-21。艺术显示包括光晕、线宽、取样密度与镜头；它们不改变公式中的参数。跨设备不承诺逐像素一致。</p></dialog>
+
+  <dialog id="formula-dialog">
+    <button class="close" data-close="formula-dialog" aria-label="关闭公式">×</button>
+    <p class="eyebrow">ACTUAL EQUATIONS / 公式可被核对</p>
+    <h2>同一场流动，<br>从方程走到一束光。</h2>
+    <div class="formula-block">
+      <h3>不可压缩 Navier–Stokes</h3>
+      <math display="block">
+        <mfrac><mrow><mo>∂</mo><mi mathvariant="bold">u</mi></mrow><mrow><mo>∂</mo><mi>t</mi></mrow></mfrac>
+        <mo>+</mo><mo>(</mo><mi mathvariant="bold">u</mi><mo>·</mo><mo>∇</mo><mo>)</mo><mi mathvariant="bold">u</mi>
+        <mo>=</mo><mo>−</mo><mo>∇</mo><mi>p</mi><mo>+</mo><mi>ν</mi><mo>Δ</mo><mi mathvariant="bold">u</mi><mo>+</mo><mi mathvariant="bold">f</mi>
+        <mo>,</mo><mspace width="1em"/><mo>∇</mo><mo>·</mo><mi mathvariant="bold">u</mi><mo>=</mo><mn>0</mn>
+      </math>
+      <p>本实验 f = 0；p 表示压力除以恒定密度。取旋度可得到涡量收支，三个分项均由当前解析状态计算。</p>
+    </div>
+    <div class="formula-block">
+      <h3>本页实际计算的高斯拉伸涡</h3>
+      <p class="display-formula">uᵣ = −αr/2，u𝓏 = αz</p>
+      <math display="block">
+        <msub><mi>u</mi><mi>θ</mi></msub><mo>=</mo><mfrac><mi>Γ</mi><mrow><mn>2</mn><mi>π</mi><mi>r</mi></mrow></mfrac>
+        <mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><msup><mi>r</mi><mn>2</mn></msup><mo>/</mo><mi>s</mi></mrow></msup><mo>)</mo>
+        <mo>,</mo><mspace width="1em"/><mi>s</mi><mo>=</mo><msup><mi>a</mi><mn>2</mn></msup>
+      </math>
+      <p class="display-formula">ds/dt = 4ν − αs</p>
+      <p class="display-formula">ω(r,t) = Γ/(πs) · exp(−r²/s)</p>
+      <p>α、ν、Γ 保持常数时，这是无界理想场的解析演变。α = 0 退化为 Oseen 扩散；s = 4ν/α 时成为稳态 Burgers 涡。改参数会从初态重新计算。a 是涡量降至轴心 1/e 的特征半径。</p>
+      <p>示踪点的径向、轴向位移按解析关系计算，转角沿轨迹用 Simpson 积分；这避免了强旋转下笛卡尔二阶步进的虚假径向膨胀。</p>
+      <p class="small-note">无限轴向拉伸背景不是有限总能量场，不能作为 NS 反例。显示窗口不是物理固壁；示踪样本离开窗口会重新播种，不参与守恒指标。</p>
+    </div>
+    <div class="formula-block"><h3>这一刻的可核查数据</h3><p id="formula-values"></p><p>CPU / GPU 输运核查：<output id="study-gpu-check">—</output></p></div>
+    <a class="source-link" href="https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/tracer-particle-dispersion-around-elementary-flow-patterns/7FD71F91EE8E947CA460B5214B30528A" target="_blank" rel="noreferrer">Goudar &amp; Elsinga，JFM 843 (2018)，§2.1 ↗</a>
+  </dialog>
+  <dialog id="card-dialog"><button class="close" data-close="card-dialog" aria-label="关闭学习卡">×</button><p class="eyebrow">留下一束光，也留下一组依据</p><h2>这一刻，<br>你看见了什么？</h2><img id="card-preview" alt="包含真实画面、参数、公式与依据的学习卡"><p id="card-title" class="small-note"></p><div class="dialog-actions"><a id="card-image" download>保存学习卡 PNG</a><a id="card-plan" download>导出方案 JSON</a><button id="card-remember">本机保存</button></div><details><summary>查看方案数据</summary><textarea id="card-json" rows="5" readonly aria-label="学习卡方案 JSON"></textarea></details><p id="card-note" class="small-note"></p></dialog>
+  <dialog id="study-load-dialog"><button class="close" data-close="study-load-dialog" aria-label="关闭方程方案载入">×</button><p class="eyebrow">让一场理解再次发生</p><h2>载入方程实验。</h2><label for="study-import">粘贴学习卡的 JSON</label><textarea id="study-import" rows="7"></textarea><p id="study-import-error" role="alert"></p><div class="dialog-actions"><button id="study-import-button">载入并重放</button><button id="study-restore">恢复本机保存</button></div><p class="small-note">涡环、二维与研究尺度方案均有独立模型标识，不会自动改写成另一种实验。</p></dialog>
+  <section id="study-fatal" role="alert" hidden><h2>画场暂时无法继续</h2><p id="study-fatal-message"></p><a href="/">回到涡环工坊 ↗</a></section>
+  <div id="study-toast" role="status" hidden></div>
+  <script type="module" src="/src/equation-app.js"></script>
+</body>
+</html>

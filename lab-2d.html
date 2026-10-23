@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f3f0e8">
+  <meta name="description" content="以边界塑形，让流动留下作品。一个可比较、可重放的二维流体交互艺术实验。">
+  <title>涡的形状 · 纸上流</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <a class="wordmark" href="/" aria-label="涡的形状首页"><img src="/favicon.svg" alt="" width="34" height="34"><span>涡的形状<small>THE SHAPE OF FLOW</small></span></a>
+    <div class="edition"><span class="small-dot"></span>纸上流 <span class="separator">/</span> 交互实验 001</div>
+    <div class="header-actions"><button id="load-button" class="text-button">载入方案</button><button id="about-button" class="text-button">关于流动 <span aria-hidden="true">↗</span></button></div>
+  </header>
+
+  <main>
+    <div class="intro-line"><p class="eyebrow">一处边界 · 一场变化</p><p>你设置条件，流动留下答案。</p></div>
+    <div class="workspace">
+      <aside class="experiment-panel">
+        <p class="experiment-number">EXPERIMENT <span>01</span></p>
+        <h1>绕流<span class="title-rule"></span></h1>
+        <p class="lead">改一处边界，<br>看流动改道。</p>
+        <ol class="steps" aria-label="实验流程">
+          <li data-stage="baseline" class="current"><span>01</span><div><strong>观察基准</strong><small>先看没有阻片时的流动</small></div></li>
+          <li data-stage="edit"><span>02</span><div><strong>安排边界</strong><small>拖动一块阻片，留下通路</small></div></li>
+          <li data-stage="trial"><span>03</span><div><strong>试流与对照</strong><small>从同一起点，观察变化</small></div></li>
+          <li data-stage="compare"><span>04</span><div><strong>留下作品</strong><small>保存图像，也保存它的条件</small></div></li>
+        </ol>
+        <div class="task-note"><p class="eyebrow">这次试着</p><h2>让更多染料<br>抵达上侧观察窗。</h2><p>调整阻片的位置，观察两侧通路怎样分配流动。</p><div class="goal-rule">较基准增加 <b>8</b> 个百分点<br>总通过量保持 <b>40%</b> 以上</div></div>
+        <p class="panel-footnote">有限边界，无限形态。<br><span>二维黏性模型 · 单一被动示踪剂</span></p>
+      </aside>
+
+      <section class="field-section" aria-label="绕流画场">
+        <div class="field-heading"><div class="field-tabs" role="group" aria-label="对照方案"><button id="view-a" class="selected" aria-pressed="true">A <span>无阻片基准</span></button><button id="view-b" disabled aria-pressed="false">B <span>我的边界</span></button></div><span id="run-status" class="run-status">等待开始</span></div>
+        <div class="canvas-shell"><canvas id="flow-canvas" tabindex="0" role="application" aria-label="流动画场。暂停编辑时，点击定位阻片；方向键微移，Shift 加方向键加速。"></canvas><div class="canvas-caption"><span id="field-caption">同一入口，同一时程。</span><span id="time-label">t = 0.00 / 8.00</span></div></div>
+        <div class="field-tools"><div class="view-options" role="group" aria-label="观察图层"><button id="layer-dye" class="active" aria-pressed="true"><span class="legend-dot teal"></span>染色</button><button id="layer-lines" class="active" aria-pressed="true"><span class="line-glyph">∿</span>瞬时流线</button></div><button id="edit-button" class="text-button" hidden>调整边界</button><button id="diagnostics-button" class="text-button">计算记录 <span aria-hidden="true">⌄</span></button></div>
+        <div class="transport-row"><button id="primary-button" class="primary-button"><span id="primary-icon" aria-hidden="true">▶</span><span id="primary-text">开始基准试流</span></button><button id="reset-button" class="icon-button" title="从起点重试" aria-label="从起点重试">↻</button><div class="timeline"><label for="time-slider">观察时刻</label><input id="time-slider" type="range" min="0" max="240" step="1" value="0" disabled><output id="timeline-value">0.00</output></div><button id="save-button" class="save-button" disabled>留下这次流动 <span aria-hidden="true">↗</span></button></div>
+        <div id="edit-controls" class="edit-controls" hidden><span class="eyebrow">阻片 1 / 1</span><label>水平 <input id="obstacle-x" type="range" min="0.35" max="1.12" step="0.01" value="0.68"></label><label>上下 <input id="obstacle-y" type="range" min="0.20" max="0.80" step="0.01" value="0.30"></label><span id="obstacle-position">(0.68, 0.30)</span></div>
+        <div id="instruction" class="instruction" aria-live="polite"><span id="instruction-mark" class="instruction-mark">①</span><p>先观察一段基准流动。随后，你将得到一块可以移动的阻片。</p></div>
+        <div id="comparison" class="comparison" hidden><div><span class="eyebrow">上侧到达量 / 总注染量</span><p><span id="baseline-rate">—</span><span class="comparison-arrow">→</span><strong id="trial-rate">—</strong></p></div><div class="result-copy"><strong id="result-title">—</strong><p id="result-detail">—</p></div><span id="gain-badge" class="gain-badge">—</span></div>
+        <div id="diagnostics-panel" class="diagnostics" hidden><div><span>投影前 → 后散度 RMS</span><output id="diag-divergence">—</output></div><div><span>示踪收支相对偏差</span><output id="diag-mass">—</output></div><div><span>固壁法向通量</span><output id="diag-wall">—</output></div><div><span>同条件求解</span><output>80 × 50 · Δt 1/120</output></div><p>颜色只示踪，不改变速度与黏度。流线表示当前速度方向；数值耗散会使染料变宽。模拟时间与长度均无量纲。</p></div>
+      </section>
+    </div>
+    <footer><span>涡的形状 <span class="footer-line">—</span> 以边界塑形，让流动留下作品。</span><span>绕流原型 · 本地计算与保存 <span aria-hidden="true">◎</span></span></footer>
+  </main>
+
+  <dialog id="about-dialog" class="about-dialog"><button class="dialog-close" data-close="about-dialog" aria-label="关闭模型说明">×</button><p class="eyebrow">关于这片流动</p><h2>看见条件，<br>也看见模型的边界。</h2><p>画面来自二维不可压缩黏性流场。阻片同时参与速度、压力和染料的计算；编辑后从共同初态重新试流。</p><p>这是有限网格上的交互艺术原型。到达率用于固定配置下的比较，尚未完成网格收敛标定。染料为被动标量，图像不承担工程预测或数学证明。当前仅开放绕流；分流、驻留、余流与自由画场在后续完善。</p><dl><div><dt>输入</dt><dd>平滑开启的左侧入流，固定脉冲注染</dd></div><div><dt>观察</dt><dd>右侧上方的观察窗、总通过量与质量收支</dd></div><div><dt>重现</dt><dd>固定网格、时间步和输入；方案按相同条件重算</dd></div></dl><div class="source-links"><a href="https://www.cs.ubc.ca/~rbridson/fluidsimulation/" target="_blank" rel="noreferrer">Bridson · 流体模拟资料 ↗</a><a href="https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-38-fast-fluid-dynamics-simulation-gpu" target="_blank" rel="noreferrer">GPU Gems · 模型与边界 ↗</a><a href="https://www.clawpack.org/riemann_book/html/Advection.html" target="_blank" rel="noreferrer">Clawpack · 输运与收支 ↗</a></div></dialog>
+  <dialog id="save-dialog"><button class="dialog-close" data-close="save-dialog" aria-label="关闭保存窗口">×</button><p class="eyebrow">留下这次流动</p><h2>一幅图像，<br>和让它发生的条件。</h2><canvas id="export-preview" aria-label="导出图像预览"></canvas><p id="export-summary"></p><div class="dialog-actions"><a id="export-image" class="primary-button" download>导出图像 PNG</a><a id="export-plan" class="save-button" download>导出方案 JSON</a></div><button id="remember-button" class="text-button remember-button">在这台浏览器记住方案</button><p class="muted">PNG 与 JSON 使用相同作品编号。载入 JSON 后重新计算，可恢复对应观察时刻。</p></dialog>
+  <dialog id="load-dialog"><button class="dialog-close" data-close="load-dialog" aria-label="关闭载入窗口">×</button><p class="eyebrow">从条件重新出发</p><h2>载入一段流动。</h2><p>选择本原型导出的 JSON，或粘贴方案文本。系统将从起点重算基准与边界方案。</p><label class="file-picker">选择 JSON 文件<input id="plan-file" type="file" accept="application/json,.json"></label><label class="textarea-label" for="plan-text">方案 JSON</label><textarea id="plan-text" rows="7" placeholder="在这里粘贴导出的方案"></textarea><p id="load-error" class="error-message" role="alert"></p><div class="dialog-actions"><button id="import-plan" class="primary-button">载入并重算</button><button id="restore-button" class="save-button">恢复本机保存</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
